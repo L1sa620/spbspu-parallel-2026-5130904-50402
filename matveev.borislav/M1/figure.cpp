@@ -1,4 +1,5 @@
 #include "figure.hpp"
+#include <algorithm>
 #include <cstddef>
 #include <istream>
 #include <stdexcept>
@@ -59,4 +60,23 @@ bool matveev::isInside(const figure_t& figure, const long double x, const long d
   const long double dy = (y - figure.centerY) / figure.verticalRadius;
   constexpr long double unitRadiusSquared = 1.0L;
   return ((dx * dx) + (dy * dy)) <= unitRadiusSquared;
+}
+
+matveev::bounds_t matveev::findBounds(const std::vector< figure_t >& figures)
+{
+  if (figures.empty())
+  {
+    throw std::invalid_argument("Cannot find bounds of an empty set of figures");
+  }
+  const figure_t& first = figures.front();
+  bounds_t bounds{first.centerX - first.horizontalRadius, first.centerX + first.horizontalRadius,
+      first.centerY - first.verticalRadius, first.centerY + first.verticalRadius};
+  for (const figure_t& figure: figures)
+  {
+    bounds.minX = std::min(bounds.minX, figure.centerX - figure.horizontalRadius);
+    bounds.maxX = std::max(bounds.maxX, figure.centerX + figure.horizontalRadius);
+    bounds.minY = std::min(bounds.minY, figure.centerY - figure.verticalRadius);
+    bounds.maxY = std::max(bounds.maxY, figure.centerY + figure.verticalRadius);
+  }
+  return bounds;
 }
