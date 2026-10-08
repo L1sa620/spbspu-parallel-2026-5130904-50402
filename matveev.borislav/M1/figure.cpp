@@ -52,3 +52,11 @@ std::vector< matveev::figure_t > matveev::readFigures(std::istream& input)
   }
   return figures;
 }
+
+bool matveev::isInside(const figure_t& figure, const long double x, const long double y)
+{
+  const long double dx = (x - figure.centerX) / figure.horizontalRadius;
+  const long double dy = (y - figure.centerY) / figure.verticalRadius;
+  constexpr long double unitRadiusSquared = 1.0L;
+  return ((dx * dx) + (dy * dy)) <= unitRadiusSquared;
+}

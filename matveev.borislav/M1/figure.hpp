@@ -15,6 +15,7 @@ namespace matveev
   };
 
   std::vector< figure_t > readFigures(std::istream& input);
+  bool isInside(const figure_t& figure, long double x, long double y);
 }
 
 #endif
