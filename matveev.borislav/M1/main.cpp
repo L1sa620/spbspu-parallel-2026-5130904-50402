@@ -1,5 +1,7 @@
 #include <exception>
+#include <iomanip>
 #include <iostream>
+#include <limits>
 #include <stdexcept>
 #include <vector>
 #include "figure.hpp"
@@ -15,6 +17,7 @@ int main(const int argc, char** const argv)
     const matveev::options_t options = matveev::parseArguments(argc, argv);
     const std::vector< matveev::figure_t > figures = matveev::readFigures(std::cin);
     const matveev::areas_t areas = matveev::calculateAreas(figures, options);
+    std::cout << std::setprecision(std::numeric_limits< long double >::max_digits10);
     std::cout << areas.coverage << " " << areas.intersection << "\n";
     std::cout.flush();
     if (!std::cout)
