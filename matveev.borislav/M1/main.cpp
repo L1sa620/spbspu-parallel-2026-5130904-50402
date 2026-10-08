@@ -1,6 +1,7 @@
 #include <exception>
 #include <iostream>
 #include <stdexcept>
+#include "figure.hpp"
 #include "options.hpp"
 
 int main(const int argc, char** const argv)
@@ -10,6 +11,7 @@ int main(const int argc, char** const argv)
   try
   {
     matveev::parseArguments(argc, argv);
+    matveev::readFigures(std::cin);
   }
   catch (const std::invalid_argument& error)
   {
