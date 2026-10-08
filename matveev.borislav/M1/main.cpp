@@ -1,7 +1,9 @@
 #include <exception>
 #include <iostream>
 #include <stdexcept>
+#include <vector>
 #include "figure.hpp"
+#include "monte_carlo.hpp"
 #include "options.hpp"
 
 int main(const int argc, char** const argv)
@@ -10,8 +12,15 @@ int main(const int argc, char** const argv)
   constexpr int internalError = 2;
   try
   {
-    matveev::parseArguments(argc, argv);
-    matveev::readFigures(std::cin);
+    const matveev::options_t options = matveev::parseArguments(argc, argv);
+    const std::vector< matveev::figure_t > figures = matveev::readFigures(std::cin);
+    const matveev::areas_t areas = matveev::calculateAreas(figures, options);
+    std::cout << areas.coverage << " " << areas.intersection << "\n";
+    std::cout.flush();
+    if (!std::cout)
+    {
+      throw std::runtime_error("Failed to write the result");
+    }
   }
   catch (const std::invalid_argument& error)
   {
