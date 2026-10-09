@@ -37,15 +37,15 @@ std::vector< matveev::figure_t > matveev::readFigures(std::istream& input)
   while (input >> token)
   {
     const long long first = parseInteger(token);
-    readInteger(input);
+    const long long second = readInteger(input);
     const long long x = readInteger(input);
     const long long y = readInteger(input);
-    if (first <= 0)
+    if ((first <= 0) || (second < 0))
     {
-      throw std::invalid_argument("The radius must be positive");
+      throw std::invalid_argument("Figure semiaxes must be positive (use zero for a circle)");
     }
     const long double horizontal = static_cast< long double >(first);
-    const long double vertical = horizontal;
+    const long double vertical = (second == 0) ? horizontal : static_cast< long double >(second);
     figures.push_back({horizontal, vertical, static_cast< long double >(x), static_cast< long double >(y)});
   }
   if (input.bad() || !input.eof())
