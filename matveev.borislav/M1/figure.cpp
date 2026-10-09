@@ -4,6 +4,7 @@
 #include <istream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace
 {
@@ -56,10 +57,10 @@ std::vector< matveev::figure_t > matveev::readFigures(std::istream& input)
 
 bool matveev::isInside(const figure_t& figure, const long double x, const long double y)
 {
-  const long double dx = (x - figure.centerX) / figure.horizontalRadius;
-  const long double dy = (y - figure.centerY) / figure.verticalRadius;
-  constexpr long double unitRadiusSquared = 1.0L;
-  return ((dx * dx) + (dy * dy)) <= unitRadiusSquared;
+  const long double dx = (x - figure.center_x) / figure.horizontal_radius;
+  const long double dy = (y - figure.center_y) / figure.vertical_radius;
+  constexpr long double unit_radius_squared = 1.0L;
+  return ((dx * dx) + (dy * dy)) <= unit_radius_squared;
 }
 
 matveev::bounds_t matveev::findBounds(const std::vector< figure_t >& figures)
@@ -69,14 +70,14 @@ matveev::bounds_t matveev::findBounds(const std::vector< figure_t >& figures)
     throw std::invalid_argument("Cannot find bounds of an empty set of figures");
   }
   const figure_t& first = figures.front();
-  bounds_t bounds{first.centerX - first.horizontalRadius, first.centerX + first.horizontalRadius,
-      first.centerY - first.verticalRadius, first.centerY + first.verticalRadius};
-  for (const figure_t& figure: figures)
+  bounds_t bounds{first.center_x - first.horizontal_radius, first.center_x + first.horizontal_radius,
+      first.center_y - first.vertical_radius, first.center_y + first.vertical_radius};
+  for (const figure_t& figure : figures)
   {
-    bounds.minX = std::min(bounds.minX, figure.centerX - figure.horizontalRadius);
-    bounds.maxX = std::max(bounds.maxX, figure.centerX + figure.horizontalRadius);
-    bounds.minY = std::min(bounds.minY, figure.centerY - figure.verticalRadius);
-    bounds.maxY = std::max(bounds.maxY, figure.centerY + figure.verticalRadius);
+    bounds.min_x = std::min(bounds.min_x, figure.center_x - figure.horizontal_radius);
+    bounds.max_x = std::max(bounds.max_x, figure.center_x + figure.horizontal_radius);
+    bounds.min_y = std::min(bounds.min_y, figure.center_y - figure.vertical_radius);
+    bounds.max_y = std::max(bounds.max_y, figure.center_y + figure.vertical_radius);
   }
   return bounds;
 }

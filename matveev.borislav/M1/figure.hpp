@@ -8,18 +8,18 @@ namespace matveev
 {
   struct figure_t
   {
-    long double horizontalRadius;
-    long double verticalRadius;
-    long double centerX;
-    long double centerY;
+    long double horizontal_radius;
+    long double vertical_radius;
+    long double center_x;
+    long double center_y;
   };
 
   struct bounds_t
   {
-    long double minX;
-    long double maxX;
-    long double minY;
-    long double maxY;
+    long double min_x;
+    long double max_x;
+    long double min_y;
+    long double max_y;
   };
 
   std::vector< figure_t > readFigures(std::istream& input);

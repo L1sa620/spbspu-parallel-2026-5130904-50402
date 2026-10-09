@@ -10,8 +10,8 @@
 
 int main(const int argc, char** const argv)
 {
-  constexpr int invalidInput = 1;
-  constexpr int internalError = 2;
+  constexpr int invalid_input = 1;
+  constexpr int internal_error = 2;
   try
   {
     const matveev::options_t options = matveev::parseArguments(argc, argv);
@@ -28,17 +28,17 @@ int main(const int argc, char** const argv)
   catch (const std::invalid_argument& error)
   {
     std::cerr << error.what() << "\n";
-    return invalidInput;
+    return invalid_input;
   }
   catch (const std::out_of_range& error)
   {
     std::cerr << error.what() << "\n";
-    return invalidInput;
+    return invalid_input;
   }
   catch (const std::exception& error)
   {
     std::cerr << error.what() << "\n";
-    return internalError;
+    return internal_error;
   }
   return 0;
 }
