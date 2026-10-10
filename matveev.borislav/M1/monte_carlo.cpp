@@ -49,9 +49,11 @@ namespace
   static hits_t countHits(const std::vector< matveev::figure_t >& figures, const matveev::bounds_t& bounds,
       const std::uint64_t tries, const std::uint64_t seed)
   {
-    std::mt19937_64 generator(seed);
-    std::uniform_real_distribution< long double > x_distribution(bounds.min_x, bounds.max_x);
-    std::uniform_real_distribution< long double > y_distribution(bounds.min_y, bounds.max_y);
+    std::default_random_engine generator(seed);
+    std::uniform_real_distribution< double > x_distribution(
+        static_cast< double >(bounds.min_x), static_cast< double >(bounds.max_x));
+    std::uniform_real_distribution< double > y_distribution(
+        static_cast< double >(bounds.min_y), static_cast< double >(bounds.max_y));
     hits_t hits{0, 0};
     for (std::uint64_t trial = 0; trial < tries; ++trial)
     {
