@@ -11,7 +11,8 @@ void matveev::executeLine(const std::string &line, Catalog &catalog, std::ostrea
     {
       return;
     }
-    const bool known = executeShape(tokens, catalog, out);
+    const bool known = executeShape(tokens, catalog, out)
+        || executeSet(tokens, catalog, out);
     if (!known)
     {
       out << "<UNKNOWN COMMAND>\n";
