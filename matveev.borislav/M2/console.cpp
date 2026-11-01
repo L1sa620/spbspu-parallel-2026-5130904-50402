@@ -2,18 +2,15 @@
 #include <iostream>
 #include <string>
 #include <stdexcept>
-#include "parse.hpp"
+#include "commands.hpp"
 
 void matveev::runConsole()
 {
+  Catalog catalog = {};
   std::string line = {};
   while (std::getline(std::cin, line))
   {
-    if (!splitLine(line).empty())
-    {
-      std::cout << "<UNKNOWN COMMAND>\n";
-      std::cout.flush();
-    }
+    executeLine(line, catalog, std::cout);
   }
   if (!std::cin.eof() || std::cin.bad() || !std::cout)
   {
