@@ -4,6 +4,11 @@
 #include <stdexcept>
 #include <type_traits>
 #include <cstddef>
+#include <chrono>
+#include <random>
+#include <exception>
+#include "channel.hpp"
+#include "monte_carlo.hpp"
 
 std::vector< char > matveev::makeRequest(const std::vector< shape_t > &shapes,
     const std::uint64_t threads, const std::uint64_t tries)
@@ -32,4 +37,50 @@ std::vector< char > matveev::makeRequest(const std::vector< shape_t > &shapes,
     std::memcpy(target + offsetof(shape_t, ellipse), &shape.ellipse, sizeof(shape.ellipse));
   }
   return bytes;
+}
+
+int matveev::runWorker(const int descriptor, const std::uint64_t seed)
+{
+  constexpr std::size_t realFields = 2;
+  constexpr std::uint64_t successfulResult = 1;
+  static_assert(sizeof(response_t) == realFields * sizeof(double) + sizeof(std::uint64_t),
+      "Unexpected response padding");
+  try
+  {
+    std::mt19937_64 seeds(seed);
+    request_t request = {};
+    while (readExact(descriptor, &request, sizeof(request)))
+    {
+      std::vector< shape_t > shapes = {};
+      if ((request.count == 0) || (request.count > shapes.max_size()))
+      {
+        throw std::runtime_error("Invalid shape count");
+      }
+      shapes.resize(static_cast< std::size_t >(request.count));
+      if (!readExact(descriptor, shapes.data(), shapes.size() * sizeof(shape_t)))
+      {
+        throw std::runtime_error("Missing shapes");
+      }
+      response_t response = {};
+      const auto start = std::chrono::steady_clock::now();
+      try
+      {
+        response.area = calculateArea(shapes, request.threads, request.tries, seeds());
+        response.success = successfulResult;
+      }
+      catch (const std::exception &)
+      {
+        response.success = 0;
+      }
+      const auto elapsed = std::chrono::steady_clock::now() - start;
+      response.milliseconds = std::chrono::duration< double, std::milli >(elapsed).count();
+      writeExact(descriptor, &response, sizeof(response));
+    }
+    return 0;
+  }
+  catch (const std::exception &)
+  {
+    constexpr int workerFailure = 1;
+    return workerFailure;
+  }
 }
