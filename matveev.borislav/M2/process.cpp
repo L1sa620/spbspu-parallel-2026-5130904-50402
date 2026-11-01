@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <cerrno>
 #include <csignal>
+#include <algorithm>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
@@ -66,4 +67,65 @@ void matveev::Process::stop(const bool force) noexcept
     {}
     pid_ = 0;
   }
+}
+
+bool matveev::Process::hasOutput() const noexcept
+{
+  return sent_ < outgoing_.size();
+}
+
+void matveev::Process::start(std::vector< char > &bytes) noexcept
+{
+  outgoing_.swap(bytes);
+  sent_ = 0;
+  response_ = {};
+  received_ = 0;
+}
+
+void matveev::Process::sendPending()
+{
+  constexpr std::size_t blockSize = 65536;
+  while (hasOutput())
+  {
+    const std::size_t count = std::min(blockSize, outgoing_.size() - sent_);
+    const ssize_t sent = ::send(channel_.get(), outgoing_.data() + sent_, count, MSG_NOSIGNAL);
+    if ((sent < 0) && (errno == EINTR))
+    {
+      continue;
+    }
+    if ((sent < 0) && ((errno == EAGAIN) || (errno == EWOULDBLOCK)))
+    {
+      return;
+    }
+    if (sent <= 0)
+    {
+      throw std::runtime_error("Cannot send calculation");
+    }
+    sent_ += static_cast< std::size_t >(sent);
+  }
+}
+
+bool matveev::Process::receive(response_t &response)
+{
+  char *const bytes = reinterpret_cast< char * >(&response_);
+  while (received_ < sizeof(response_))
+  {
+    const ssize_t count = ::recv(channel_.get(), bytes + received_, sizeof(response_) - received_, 0);
+    if ((count < 0) && (errno == EINTR))
+    {
+      continue;
+    }
+    if ((count < 0) && ((errno == EAGAIN) || (errno == EWOULDBLOCK)))
+    {
+      return false;
+    }
+    if (count <= 0)
+    {
+      throw std::runtime_error("Worker disconnected");
+    }
+    received_ += static_cast< std::size_t >(count);
+  }
+  response = response_;
+  received_ = 0;
+  return true;
 }
